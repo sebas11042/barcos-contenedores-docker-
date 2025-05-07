@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gestión de Barcos y Contenedores</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+<body class="container mt-4">
+
+    <h2 class="text-center mb-4">Listado de Barcos</h2>
+
+    <!-- Tabla de barcos -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Capacidad</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="barco : ${barcos}">
+                <td th:text="${barco.nombre}">Nombre</td>
+                <td th:text="${barco.origen}">Origen</td>
+                <td th:text="${barco.destino}">Destino</td>
+                <td th:text="${barco.capacidad}">Capacidad</td>
+                <td>
+                    <a th:href="@{/barcos/editar/{id}(id=${barco.id})}" class="btn btn-warning btn-sm">Editar</a>
+                    <a th:href="@{/barcos/eliminar/{id}(id=${barco.id})}" class="btn btn-danger btn-sm">Eliminar</a>
+                    <a th:href="@{/barcos/{id}/contenedores(id=${barco.id})}" class="btn btn-primary btn-sm">Ver Contenedores</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Formulario para agregar/editar barco -->
+    <div class="card mb-4">
+        <div class="card-header">Formulario Barco</div>
+        <div class="card-body">
+            <form th:action="@{/barcos/guardar}" th:object="${barcoNuevo}" method="post">
+                <input type="hidden" th:field="*{id}">
+                <div class="row">
+                    <div class="col">
+                        <input type="text" th:field="*{nombre}" class="form-control" placeholder="Nombre" required>
+                    </div>
+                    <div class="col">
+                        <input type="text" th:field="*{origen}" class="form-control" placeholder="Origen" required>
+                    </div>
+                    <div class="col">
+                        <input type="text" th:field="*{destino}" class="form-control" placeholder="Destino" required>
+                    </div>
+                    <div class="col">
+                        <input type="number" th:field="*{capacidad}" class="form-control" placeholder="Capacidad" required>
+                    </div>
+                    <div class="col">
+                        <button type="submit" class="btn btn-success w-100">Guardar Barco</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mostrar contenedores si se seleccionó un barco -->
+    <div th:if="${barcoSeleccionado != null}">
+        <h3>Contenedores del Barco: <span th:text="${barcoSeleccionado.nombre}"></span></h3>
+
+        <!-- Tabla de contenedores -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>VIN</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="contenedor : ${contenedores}">
+                    <td th:text="${contenedor.vin}">VIN</td>
+                    <td th:text="${contenedor.fecha}">Fecha</td>
+                    <td>
+                        <a th:href="@{/contenedores/eliminar/{id}(id=${contenedor.id})}" class="btn btn-danger btn-sm">Eliminar</a>
+                        <a th:href="@{/contenedores/editar/{id}(id=${contenedor.id})}" class="btn btn-warning btn-sm">Editar</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Formulario para agregar o editar el contenedor -->
+        <div class="card">
+            <div class="card-header">Formulario Contenedor</div>
+            <div class="card-body">
+                <form th:action="@{/contenedores/guardar}" th:object="${contenedorNuevo}" method="post">
+                    <!-- Campo oculto para ID del contenedor (edición) -->
+                    <input type="hidden" th:field="*{id}">
+                    <!-- Campo oculto para el barco asociado -->
+                    <input type="hidden" name="barcoId" th:value="${barcoSeleccionado.id}">
+                    <div class="row">
+                        <div class="col">
+                            <input type="text" th:field="*{vin}" class="form-control" placeholder="VIN" required>
+                        </div>
+                        <div class="col">
+                            <input type="date" th:field="*{fecha}" class="form-control" required>
+                        </div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-success w-100">Guardar Contenedor</button>
+                        </div>
+                    </div>
+                    <div th:if="${errorCapacidad}" class="alert alert-danger mt-3" role="alert">
+                        <span th:text="${errorCapacidad}"></span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
